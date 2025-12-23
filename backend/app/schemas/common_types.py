@@ -26,7 +26,7 @@ class Pagination(BaseModel):
     has_more: bool = Field(..., description="Whether more data is available")
     total_count: int | None = Field(
         None,
-        description="Total number of records matching the query (after filters, before pagination). Always included when available.",
+        description="Total number of records matching the query",
         example=150,
     )
 
