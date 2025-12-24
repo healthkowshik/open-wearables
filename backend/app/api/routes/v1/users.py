@@ -27,11 +27,19 @@ async def list_users(
     responses={
         401: {
             "description": "Authentication required",
-            "content": {"application/json": {"example": {"detail": "Authentication required: provide JWT token or API key"}}},
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Authentication required: provide JWT token or API key"}
+                }
+            },
         },
         404: {
             "description": "User not found",
-            "content": {"application/json": {"example": {"detail": "User with ID: 123e4567-e89b-12d3-a456-426614174000 not found."}}},
+            "content": {
+                "application/json": {
+                    "example": {"detail": "User with ID: 123e4567-e89b-12d3-a456-426614174000 not found."}
+                }
+            },
         },
         400: {
             "description": "Validation error",
