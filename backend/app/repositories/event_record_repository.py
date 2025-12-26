@@ -213,7 +213,7 @@ class EventRecordRepository(
                 ExternalDeviceMapping.user_id == user_id,
                 EventRecord.category == "sleep",
                 EventRecord.start_datetime >= start_date,
-                EventRecord.end_datetime <= end_date,
+                cast(EventRecord.start_datetime, Date) <= cast(end_date, Date),
             )
             .group_by(
                 cast(EventRecord.start_datetime, Date),
