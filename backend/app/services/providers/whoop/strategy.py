@@ -27,4 +27,4 @@ class WhoopStrategy(BaseProviderStrategy):
     @property
     def api_base_url(self) -> str:
         """Base URL for the provider's API."""
-        return "https://api.prod.whoop.com"
+        return "https://api.prod.whoop.com/developer"

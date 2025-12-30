@@ -40,7 +40,7 @@ class WhoopOAuth(BaseOAuthTemplate):
         try:
             # Whoop API endpoint to get user info
             user_info_response = httpx.get(
-                f"{self.api_base_url}/developer/v2/user/profile/basic",
+                f"{self.api_base_url}/v2/user/profile/basic",
                 headers={"Authorization": f"Bearer {token_response.access_token}"},
                 timeout=30.0,
             )
