@@ -1,5 +1,6 @@
 """Whoop 247 Data implementation for sleep, recovery, and activity samples."""
 
+from contextlib import suppress
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Any
@@ -85,9 +86,7 @@ class Whoop247Data(Base247DataTemplate):
                 params["nextToken"] = next_token
 
             try:
-                response = self._make_api_request(
-                    db, user_id, "/v2/activity/sleep", params=params
-                )
+                response = self._make_api_request(db, user_id, "/v2/activity/sleep", params=params)
 
                 # Extract records from response
                 records = response.get("records", []) if isinstance(response, dict) else []
@@ -157,11 +156,8 @@ class Whoop247Data(Base247DataTemplate):
         # Generate UUID for our internal ID (use Whoop ID if it's a valid UUID string)
         internal_id = uuid4()
         if sleep_id:
-            try:
+            with suppress(ValueError, TypeError):
                 internal_id = UUID(sleep_id)
-            except (ValueError, TypeError):
-                # If Whoop ID is not a valid UUID, use generated one
-                pass
 
         return {
             "id": internal_id,
@@ -224,9 +220,7 @@ class Whoop247Data(Base247DataTemplate):
             duration_seconds=normalized_sleep.get("duration_seconds"),
             start_datetime=start_dt,
             end_datetime=end_dt,
-            external_id=str(normalized_sleep.get("whoop_sleep_id"))
-            if normalized_sleep.get("whoop_sleep_id")
-            else None,
+            external_id=str(normalized_sleep.get("whoop_sleep_id")) if normalized_sleep.get("whoop_sleep_id") else None,
             provider_name=self.provider_name,
             user_id=user_id,
         )
@@ -235,9 +229,7 @@ class Whoop247Data(Base247DataTemplate):
         stages = normalized_sleep.get("stages", {})
         # Calculate total sleep time (deep + light + REM)
         total_sleep_seconds = (
-            stages.get("deep_seconds", 0)
-            + stages.get("light_seconds", 0)
-            + stages.get("rem_seconds", 0)
+            stages.get("deep_seconds", 0) + stages.get("light_seconds", 0) + stages.get("rem_seconds", 0)
         )
         total_sleep_minutes = total_sleep_seconds // 60
 
@@ -319,9 +311,7 @@ class Whoop247Data(Base247DataTemplate):
         }
 
         try:
-            results["sleep_sessions_synced"] = self.load_and_save_sleep(
-                db, user_id, start_time, end_time
-            )
+            results["sleep_sessions_synced"] = self.load_and_save_sleep(db, user_id, start_time, end_time)
         except Exception as e:
             self.logger.error(f"Failed to sync sleep data: {e}")
 
@@ -392,4 +382,3 @@ class Whoop247Data(Base247DataTemplate):
     ) -> dict[str, Any]:
         """Normalize daily activity statistics to our schema."""
         return {}
-
