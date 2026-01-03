@@ -16,4 +16,4 @@ set -e
 cd "$(dirname "$0")/../.."
 
 echo "Starting Open Wearables MCP Server..."
-uv run python -m mcp
+uv run python -m mcp_server
