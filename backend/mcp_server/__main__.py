@@ -7,4 +7,4 @@ Usage:
 from mcp_server.server import mcp
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="sse", host="0.0.0.0", port=8001)

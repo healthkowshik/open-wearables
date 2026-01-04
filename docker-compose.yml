@@ -59,11 +59,11 @@ services:
     environment:
       - DB_HOST=db
       - REDIS_HOST=redis
+    ports:
+      - "8001:8001"
     depends_on:
       db:
         condition: service_healthy
-    stdin_open: true  # Required for STDIO transport
-    tty: true          # Required for STDIO transport
     develop:
       watch:
         - action: sync+restart
