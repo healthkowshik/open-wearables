@@ -103,11 +103,6 @@ from .personal_record import (
 from .polar.exercise_import import (
     ExerciseJSON as PolarExerciseJSON,
 )
-from .whoop.workout_import import (
-    WhoopWorkoutCollectionJSON,
-    WhoopWorkoutJSON,
-    WhoopWorkoutScoreJSON,
-)
 from .provider_setting import (
     BulkProviderSettingsUpdate,
     ProviderSettingRead,
@@ -158,6 +153,11 @@ from .user import (
     UserRead,
     UserUpdate,
     UserUpdateInternal,
+)
+from .whoop.workout_import import (
+    WhoopWorkoutCollectionJSON,
+    WhoopWorkoutJSON,
+    WhoopWorkoutScoreJSON,
 )
 
 __all__ = [
