@@ -103,11 +103,11 @@ class WhoopWorkouts(BaseWorkoutsTemplate):
         """Get detailed workout data from Whoop API."""
         return self._make_api_request(db, user_id, f"/v2/activity/workout/{workout_id}")
 
-    def _extract_dates(self, start_iso: str, end_iso: str) -> tuple[datetime, datetime]:
+    def _extract_dates(self, start_timestamp: str, end_timestamp: str) -> tuple[datetime, datetime]:
         """Extract start and end dates from ISO 8601 strings."""
         # Parse ISO 8601 strings, handling timezone info
-        start_date = datetime.fromisoformat(start_iso.replace("Z", "+00:00"))
-        end_date = datetime.fromisoformat(end_iso.replace("Z", "+00:00"))
+        start_date = datetime.fromisoformat(start_timestamp.replace("Z", "+00:00"))
+        end_date = datetime.fromisoformat(end_timestamp.replace("Z", "+00:00"))
 
         # Ensure timezone-aware
         if start_date.tzinfo is None:
