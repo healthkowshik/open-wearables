@@ -4,8 +4,8 @@
 # Usage:
 #   ./scripts/start/mcp.sh
 #
-# The MCP server uses SSE (HTTP) transport on port 8001.
-# Connect via: http://localhost:8001/sse
+# The MCP server uses stdio transport (stdin/stdout).
+# It is spawned by MCP clients (e.g., Claude Desktop) as a subprocess.
 #
 # Environment variables:
 #   - All database and config variables from the main app are supported
@@ -15,5 +15,6 @@ set -e
 
 cd "$(dirname "$0")/../.."
 
-echo "Starting Open Wearables MCP Server on port 8001..."
+# Note: No echo statements here - stdout is reserved for MCP protocol messages
+# Any debug output should go to stderr
 uv run python -m mcp_server

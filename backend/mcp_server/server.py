@@ -50,4 +50,4 @@ register_user_tools(mcp, get_db_session)
 
 
 if __name__ == "__main__":
-    mcp.run(transport="sse", host="0.0.0.0", port=8001)
+    mcp.run()  # stdio transport (default) - spawned by MCP clients
