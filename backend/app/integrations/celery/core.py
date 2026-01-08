@@ -21,9 +21,10 @@ def create_celery() -> Celery:
     celery_app.autodiscover_tasks(["app.integrations.celery.tasks"])
 
     celery_app.conf.beat_schedule = {
-        "sync-all-users-hourly": {
+        "sync-all-users-periodic": {
             "task": "app.integrations.celery.tasks.periodic_sync_task.sync_all_users",
-            "schedule": 3600.0,
+            "schedule": float(settings.sync_interval_seconds),
+            "args": (),  # No args - task calculates date range dynamically
         },
     }
 
