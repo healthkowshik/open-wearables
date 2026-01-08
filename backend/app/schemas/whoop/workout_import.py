@@ -19,7 +19,6 @@ class WhoopWorkoutJSON(BaseModel):
     """Whoop workout data from API."""
 
     id: str  # UUID
-    v1_id: int | None = None
     user_id: int
     created_at: str
     updated_at: str
