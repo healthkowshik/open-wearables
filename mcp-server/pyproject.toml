@@ -1,0 +1,25 @@
+[project]
+name = "open-wearables-mcp"
+version = "0.1.0"
+description = "MCP server for Open Wearables platform - enables LLM clients to query health and wearable data"
+requires-python = ">=3.13"
+dependencies = [
+    "fastmcp>=2.0.0,<3",
+]
+
+[project.scripts]
+open-wearables-mcp = "open_wearables_mcp:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/open_wearables_mcp"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["I", "F", "E", "W"]

@@ -1,13 +1,10 @@
----
-title: "MCP Server Configuration"
-description: "Connect Claude Desktop or other MCP clients to Open Wearables"
----
+# Open Wearables MCP Server
 
-# MCP Server
+A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that enables LLM clients to query health and wearable data from the Open Wearables platform.
 
-The Open Wearables MCP (Model Context Protocol) Server enables LLM clients like Claude Desktop to query health and wearable data using natural language.
+## Overview
 
-The MCP server is a **standalone component** located in the `mcp-server/` directory at the repository root.
+This MCP server allows AI assistants like Claude to interact with the Open Wearables database through natural language. It exposes tools for querying users, health metrics, and wearable data.
 
 ## Transport
 
@@ -18,19 +15,20 @@ The MCP server uses **stdio transport**, which means:
 
 This is the recommended approach per the [MCP specification](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports).
 
+## Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_users` | List users with pagination and search |
+| `get_user` | Get detailed information for a specific user |
+
 ## Configuration
 
 ### Prerequisites
 
 - Docker Desktop running
+- The `open-wearables-platform:latest` image built (`docker compose build`)
 - Database container running (`docker compose up db -d`)
-
-### Building the MCP Server Image
-
-```bash
-# From repository root
-docker build -f mcp-server/Dockerfile -t open-wearables-mcp:latest .
-```
 
 ### Claude Desktop
 
@@ -48,18 +46,17 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
         "--init",
         "--network", "open-wearables_default",
         "-e", "DB_HOST=db",
-        "open-wearables-mcp:latest"
+        "open-wearables-platform:latest",
+        "mcp-server/scripts/start.sh"
       ]
     }
   }
 }
 ```
 
-The `--init` flag ensures proper signal handling and clean shutdown when the MCP client disconnects.
-
 ### Cursor / VS Code
 
-Add to your MCP configuration (e.g., `~/.cursor/mcp.json`):
+Add to your MCP configuration:
 
 ```json
 {
@@ -70,25 +67,17 @@ Add to your MCP configuration (e.g., `~/.cursor/mcp.json`):
         "run", "-i", "--rm", "--init",
         "--network", "open-wearables_default",
         "-e", "DB_HOST=db",
-        "open-wearables-mcp:latest"
+        "open-wearables-platform:latest",
+        "mcp-server/scripts/start.sh"
       ]
     }
   }
 }
 ```
 
-## Available Tools
-
-The MCP server exposes the following tools:
-
-| Tool | Description |
-|------|-------------|
-| `list_users` | List users with pagination and search |
-| `get_user` | Get detailed information for a specific user |
-
 ## Local Development
 
-### Running without Docker
+### Running locally (without Docker)
 
 ```bash
 cd mcp-server
@@ -112,41 +101,42 @@ cd mcp-server
 PYTHONPATH="../backend" npx @anthropic-ai/mcp-inspector uv run python -m open_wearables_mcp
 ```
 
-## Debugging
+### Manual Testing
 
-To test the MCP server manually with Docker:
+Run the server and paste JSON-RPC messages:
 
 ```bash
-docker run -it --rm --init \
-  --network open-wearables_default \
-  -e DB_HOST=db \
-  open-wearables-mcp:latest
+./scripts/start.sh
 ```
 
-Then paste these JSON-RPC messages to test:
-
+Initialize:
 ```json
 {"jsonrpc": "2.0", "method": "initialize", "id": 1, "params": {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "test", "version": "1.0"}}}
 ```
 
+List users:
 ```json
 {"jsonrpc": "2.0", "method": "tools/call", "id": 2, "params": {"name": "list_users", "arguments": {}}}
 ```
 
 ## Architecture
 
-The MCP server imports from the backend `app` module for database access and business logic:
+The MCP server is a standalone component that imports from the backend `app` module for database access and business logic. This allows it to:
+
+- Reuse existing database models and services
+- Stay in sync with backend schema changes
+- Maintain consistent business logic
 
 ```
 open-wearables/
 ├── backend/           # Main API server
 │   └── app/           # Application code (imported by MCP server)
 ├── frontend/          # Web UI
-└── mcp-server/        # Standalone MCP server
-    ├── Dockerfile
-    ├── pyproject.toml
-    └── src/
-        └── open_wearables_mcp/
-            ├── server.py
-            └── tools/
+└── mcp-server/        # This directory
+    ├── src/
+    │   └── open_wearables_mcp/
+    │       ├── server.py    # MCP server setup
+    │       └── tools/       # MCP tool definitions
+    └── scripts/
+        └── start.sh         # Entry point
 ```

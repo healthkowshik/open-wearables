@@ -4,21 +4,16 @@ A Model Context Protocol server that enables LLM clients to query
 health and wearable data from the Open Wearables platform.
 
 Usage:
-    python -m mcp_server.server
+    python -m open_wearables_mcp
 """
 
-import sys
 from contextlib import contextmanager
-from pathlib import Path
 from typing import Iterator
-
-# Add parent directory to path to import app modules
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fastmcp import FastMCP
 
 from app.database import SessionLocal
-from mcp_server.tools.users import register_user_tools
+from open_wearables_mcp.tools.users import register_user_tools
 
 # Initialize FastMCP server
 mcp = FastMCP(
