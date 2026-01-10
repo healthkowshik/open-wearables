@@ -40,6 +40,7 @@
               "dev-guides/backend-e2e-integration",
               "dev-guides/how-to-add-new-provider",
               "dev-guides/mcp-server"
+              "dev-guides/aws-setup"
             ]
           },
           {
@@ -65,6 +66,7 @@
             "group": "Integration Guides",
             "pages": [
               "api-reference/guides/quick-integration",
+              "api-reference/guides/apple-xml-import",
               "api-reference/guides/provider-setup",
               "api-reference/guides/data-types",
               "api-reference/guides/error-handling"

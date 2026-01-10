@@ -1,6 +1,8 @@
 from logging import Logger, getLogger
 from uuid import UUID
 
+from sqlalchemy.orm import selectinload
+
 from app.database import DbSession
 from app.models import (
     EventRecord,
@@ -198,6 +200,7 @@ class EventRecordService(
         # This is a simplified fetch, ideally we should have a dedicated repo method
         record = (
             db_session.query(EventRecord)
+            .options(selectinload(EventRecord.detail))
             .filter(EventRecord.id == workout_id, EventRecord.category == "workout")
             .first()
         )
@@ -297,10 +300,10 @@ class EventRecordService(
                 else None,
                 is_nap=details.is_nap if (details and details.is_nap is not None) else False,
                 stages=SleepStagesSummary(
-                    deep_seconds=(details.sleep_deep_minutes or 0) * 60 if details else 0,
-                    light_seconds=(details.sleep_light_minutes or 0) * 60 if details else 0,
-                    rem_seconds=(details.sleep_rem_minutes or 0) * 60 if details else 0,
-                    awake_seconds=(details.sleep_awake_minutes or 0) * 60 if details else 0,
+                    deep_minutes=details.sleep_deep_minutes or 0 if details else 0,
+                    light_minutes=details.sleep_light_minutes or 0 if details else 0,
+                    rem_minutes=details.sleep_rem_minutes or 0 if details else 0,
+                    awake_minutes=details.sleep_awake_minutes or 0 if details else 0,
                 )
                 if details
                 else None,
