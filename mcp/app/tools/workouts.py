@@ -4,54 +4,15 @@ import logging
 from collections import Counter
 from datetime import UTC, datetime, timedelta
 
+from app.formatters import (
+    format_distance_km,
+    format_duration_seconds,
+    format_pace,
+    parse_datetime,
+)
 from app.services.api_client import client
 
 logger = logging.getLogger(__name__)
-
-
-def _format_duration_seconds(seconds: int | None) -> str | None:
-    """Format duration in seconds to human-readable string."""
-    if seconds is None:
-        return None
-    hours = seconds // 3600
-    minutes = (seconds % 3600) // 60
-    if hours > 0:
-        return f"{hours}h {minutes}m"
-    return f"{minutes}m"
-
-
-def _format_distance(meters: float | None) -> str | None:
-    """Format distance in meters to km with unit."""
-    if meters is None:
-        return None
-    km = meters / 1000
-    if km >= 10:
-        return f"{km:.1f} km"
-    return f"{km:.2f} km"
-
-
-def _format_pace(sec_per_km: int | None) -> str | None:
-    """Format pace in seconds per km to 'X:XX min/km' format."""
-    if sec_per_km is None:
-        return None
-    minutes = sec_per_km // 60
-    seconds = sec_per_km % 60
-    return f"{minutes}:{seconds:02d} min/km"
-
-
-def _format_datetime(dt_str: str | None) -> tuple[str | None, str | None]:
-    """Extract date and time from ISO datetime string.
-
-    Returns:
-        Tuple of (date_str, time_str) in formats YYYY-MM-DD and HH:MM
-    """
-    if not dt_str:
-        return None, None
-    try:
-        dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
-        return dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M")
-    except (ValueError, AttributeError):
-        return None, None
 
 
 async def get_workouts(
@@ -233,8 +194,8 @@ async def get_workouts(
             # Extract date and time from start_time
             start_dt = record.get("start_time")
             end_dt = record.get("end_time")
-            date_str, start_time_str = _format_datetime(start_dt)
-            _, end_time_str = _format_datetime(end_dt)
+            date_str, start_time_str = parse_datetime(start_dt)
+            _, end_time_str = parse_datetime(end_dt)
 
             # Get duration
             duration = record.get("duration_seconds")
@@ -268,13 +229,13 @@ async def get_workouts(
                     "start_time": start_time_str,
                     "end_time": end_time_str,
                     "duration_seconds": duration,
-                    "duration_formatted": _format_duration_seconds(duration),
+                    "duration_formatted": format_duration_seconds(duration),
                     "distance_meters": distance,
-                    "distance_formatted": _format_distance(distance),
+                    "distance_formatted": format_distance_km(distance),
                     "calories_kcal": calories,
                     "avg_heart_rate_bpm": record.get("avg_heart_rate_bpm"),
                     "max_heart_rate_bpm": record.get("max_heart_rate_bpm"),
-                    "pace_formatted": _format_pace(record.get("avg_pace_sec_per_km")),
+                    "pace_formatted": format_pace(record.get("avg_pace_sec_per_km")),
                     "elevation_gain_meters": record.get("elevation_gain_meters"),
                     "source": source_provider,
                 }
@@ -287,9 +248,9 @@ async def get_workouts(
             "total_workouts": len(workouts),
             "workouts_by_type": workouts_by_type if workouts_by_type else None,
             "total_duration_seconds": total_duration if total_duration > 0 else None,
-            "total_duration_formatted": _format_duration_seconds(total_duration) if total_duration > 0 else None,
+            "total_duration_formatted": format_duration_seconds(total_duration) if total_duration > 0 else None,
             "total_distance_meters": total_distance if total_distance > 0 else None,
-            "total_distance_formatted": _format_distance(total_distance) if total_distance > 0 else None,
+            "total_distance_formatted": format_distance_km(total_distance) if total_distance > 0 else None,
             "total_calories_kcal": round(total_calories) if total_calories > 0 else None,
         }
 

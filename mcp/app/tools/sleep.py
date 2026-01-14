@@ -3,30 +3,10 @@
 import logging
 from datetime import UTC, datetime, timedelta
 
+from app.formatters import format_duration_minutes, parse_time
 from app.services.api_client import client
 
 logger = logging.getLogger(__name__)
-
-
-def _format_duration(minutes: int | None) -> str | None:
-    """Format duration in minutes to human-readable string."""
-    if minutes is None:
-        return None
-    hours = minutes // 60
-    mins = minutes % 60
-    return f"{hours}h {mins}m"
-
-
-def _format_time(dt_str: str | None) -> str | None:
-    """Extract time portion from ISO datetime string."""
-    if not dt_str:
-        return None
-    try:
-        # Parse ISO format and return just the time
-        dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
-        return dt.strftime("%H:%M")
-    except (ValueError, AttributeError):
-        return dt_str
 
 
 async def get_sleep_records(
@@ -194,10 +174,10 @@ async def get_sleep_records(
             records.append(
                 {
                     "date": str(record.get("date")),
-                    "start_time": _format_time(record.get("start_time")),
-                    "end_time": _format_time(record.get("end_time")),
+                    "start_time": parse_time(record.get("start_time")),
+                    "end_time": parse_time(record.get("end_time")),
                     "duration_minutes": duration,
-                    "duration_formatted": _format_duration(duration),
+                    "duration_formatted": format_duration_minutes(duration),
                     "source": source.get("provider") if isinstance(source, dict) else source,
                 }
             )
@@ -217,7 +197,7 @@ async def get_sleep_records(
             summary.update(
                 {
                     "avg_duration_minutes": round(avg),
-                    "avg_duration_formatted": _format_duration(round(avg)),
+                    "avg_duration_formatted": format_duration_minutes(round(avg)),
                     "min_duration_minutes": min(durations),
                     "max_duration_minutes": max(durations),
                 }
