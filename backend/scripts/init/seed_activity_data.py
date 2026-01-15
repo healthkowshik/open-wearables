@@ -262,7 +262,7 @@ def generate_time_series_samples(
 def seed_activity_data() -> None:
     """Create 2 users with comprehensive health data using bulk inserts."""
     from app.models import EventRecord, DataPointSeries
-    from app.repositories import EventRecordRepository
+    from app.repositories import EventRecordRepository, DataPointSeriesRepository
 
     with SessionLocal() as db:
         users_created = 0
@@ -274,7 +274,7 @@ def seed_activity_data() -> None:
         personal_record_repo = CrudRepository(PersonalRecord)
         event_record_repo = EventRecordRepository(EventRecord)
         event_detail_repo = EventRecordDetailRepository(EventRecordDetail)
-        timeseries_repo = CrudRepository(DataPointSeries)
+        timeseries_repo = DataPointSeriesRepository(DataPointSeries)
 
         for user_num in range(1, 3):
             # Create user

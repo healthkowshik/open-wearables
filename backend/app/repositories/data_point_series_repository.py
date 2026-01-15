@@ -65,6 +65,40 @@ class DataPointSeriesRepository(
         super().__init__(model)
         self.mapping_repo = ExternalMappingRepository(ExternalDeviceMapping)
 
+    def bulk_create(
+        self, db_session: DbSession, creators: list[TimeSeriesSampleCreate], *, commit: bool = True
+    ) -> list[DataPointSeries]:
+        """Bulk insert multiple data point samples efficiently with a single commit."""
+        # Cache mappings to avoid repeated queries
+        mapping_cache: dict[tuple, UUID] = {}
+        objects = []
+
+        for creator in creators:
+            cache_key = (creator.user_id, creator.provider_name, creator.device_id)
+
+            if cache_key not in mapping_cache:
+                mapping = self.mapping_repo.ensure_mapping(
+                    db_session,
+                    creator.user_id,
+                    creator.provider_name,
+                    creator.device_id,
+                    creator.external_device_mapping_id,
+                )
+                mapping_cache[cache_key] = mapping.id
+
+            creation_data = creator.model_dump()
+            creation_data["external_device_mapping_id"] = mapping_cache[cache_key]
+            creation_data["series_type_definition_id"] = get_series_type_id(creator.series_type)
+            for redundant_key in ("user_id", "provider_name", "device_id", "series_type"):
+                creation_data.pop(redundant_key, None)
+
+            objects.append(self.model(**creation_data))
+
+        db_session.add_all(objects)
+        if commit:
+            db_session.commit()
+        return objects
+
     @handle_exceptions
     def create(self, db_session: DbSession, creator: TimeSeriesSampleCreate) -> DataPointSeries:
         """Create a data point sample, or return existing if duplicate.
