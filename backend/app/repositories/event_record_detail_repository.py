@@ -50,3 +50,31 @@ class EventRecordDetailRepository(
     def get_by_record_id(self, db_session: DbSession, record_id: UUID) -> EventRecordDetail | None:
         """Get detail by its associated event record ID."""
         return db_session.query(EventRecordDetail).filter(EventRecordDetail.record_id == record_id).one_or_none()
+
+    def bulk_create(
+        self,
+        db_session: DbSession,
+        creators: list[EventRecordDetailCreate],
+        *,
+        commit: bool = True,
+    ) -> list[WorkoutDetails]:
+        """Bulk insert multiple workout detail records efficiently."""
+        objects = [WorkoutDetails(**creator.model_dump(exclude_none=True)) for creator in creators]
+        db_session.add_all(objects)
+        if commit:
+            db_session.commit()
+        return objects
+
+    def bulk_create_sleep(
+        self,
+        db_session: DbSession,
+        creators: list[EventRecordDetailCreate],
+        *,
+        commit: bool = True,
+    ) -> list[SleepDetails]:
+        """Bulk insert multiple sleep detail records efficiently."""
+        objects = [SleepDetails(**creator.model_dump(exclude_none=True)) for creator in creators]
+        db_session.add_all(objects)
+        if commit:
+            db_session.commit()
+        return objects

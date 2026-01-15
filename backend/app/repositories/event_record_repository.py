@@ -63,6 +63,39 @@ class EventRecordRepository(
                 return existing
             raise
 
+    def bulk_create(
+        self, db_session: DbSession, creators: list[EventRecordCreate], *, commit: bool = True
+    ) -> list[EventRecord]:
+        """Bulk insert multiple event records efficiently with a single commit."""
+        # Cache mappings to avoid repeated queries
+        mapping_cache: dict[tuple, UUID] = {}
+        objects = []
+
+        for creator in creators:
+            cache_key = (creator.user_id, creator.provider_name or "unknown", creator.device_id)
+
+            if cache_key not in mapping_cache:
+                mapping = self.mapping_repo.ensure_mapping(
+                    db_session,
+                    creator.user_id,
+                    creator.provider_name or "unknown",
+                    creator.device_id,
+                    creator.external_device_mapping_id,
+                )
+                mapping_cache[cache_key] = mapping.id
+
+            creation_data = creator.model_dump()
+            creation_data["external_device_mapping_id"] = mapping_cache[cache_key]
+            for redundant_key in ("user_id", "provider_name", "device_id"):
+                creation_data.pop(redundant_key, None)
+
+            objects.append(self.model(**creation_data))
+
+        db_session.add_all(objects)
+        if commit:
+            db_session.commit()
+        return objects
+
     def get_records_with_filters(
         self,
         db_session: DbSession,

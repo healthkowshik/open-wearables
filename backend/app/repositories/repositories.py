@@ -28,6 +28,16 @@ class CrudRepository[
         db_session.refresh(creation)
         return creation
 
+    def bulk_create(
+        self, db_session: DbSession, creators: list[CreateSchemaType], *, commit: bool = True
+    ) -> list[ModelType]:
+        """Bulk insert multiple records efficiently with a single commit."""
+        objects = [self.model(**creator.model_dump()) for creator in creators]
+        db_session.add_all(objects)
+        if commit:
+            db_session.commit()
+        return objects
+
     def get(self, db_session: DbSession, object_id: UUID | int) -> ModelType | None:
         return db_session.query(self.model).filter(getattr(self.model, "id") == object_id).one_or_none()
 

@@ -260,7 +260,10 @@ def generate_time_series_samples(
 
 
 def seed_activity_data() -> None:
-    """Create 10 users with comprehensive health data."""
+    """Create 2 users with comprehensive health data using bulk inserts."""
+    from app.models import EventRecord, DataPointSeries
+    from app.repositories import EventRecordRepository
+
     with SessionLocal() as db:
         users_created = 0
         workouts_created = 0
@@ -269,7 +272,9 @@ def seed_activity_data() -> None:
 
         # Initialize repositories
         personal_record_repo = CrudRepository(PersonalRecord)
+        event_record_repo = EventRecordRepository(EventRecord)
         event_detail_repo = EventRecordDetailRepository(EventRecordDetail)
+        timeseries_repo = CrudRepository(DataPointSeries)
 
         for user_num in range(1, 3):
             # Create user
@@ -289,12 +294,16 @@ def seed_activity_data() -> None:
             personal_record_repo.create(db, personal_record_data)
             print(f"  ✓ Created personal record for user {user_num}")
 
-            # Create 80 workouts for this user
+            # Collect all workout records and details for bulk insert
+            workout_records = []
+            workout_details = []
+            all_time_series = []
+
+            print(f"  Generating 80 workouts...")
             for workout_num in range(1, 81):
                 record, detail = generate_workout(user.id, fake)
-                event_record_service.create(db, record)
-                event_record_service.create_detail(db, detail)  # Defaults to "workout"
-                workouts_created += 1
+                workout_records.append(record)
+                workout_details.append(detail)
 
                 # Generate time series samples for some workouts (30% chance)
                 if fake.boolean(chance_of_getting_true=30):
@@ -307,23 +316,44 @@ def seed_activity_data() -> None:
                         provider_name=record.provider_name or "Apple",
                         device_id=device_id,
                     )
-                    if samples:
-                        timeseries_service.bulk_create_samples(db, samples)
-                        time_series_samples_created += len(samples)
+                    all_time_series.extend(samples)
 
-                if workout_num % 20 == 0:
-                    print(f"  Created {workout_num}/80 workouts for user {user_num}")
+            # Bulk insert workouts
+            print(f"  Inserting {len(workout_records)} workouts...")
+            event_record_repo.bulk_create(db, workout_records, commit=False)
+            workouts_created += len(workout_records)
 
-            # Create 20 sleep records for this user
+            # Bulk insert workout details
+            print(f"  Inserting {len(workout_details)} workout details...")
+            event_detail_repo.bulk_create(db, workout_details, commit=False)
+
+            # Bulk insert time series (skip if too many to avoid memory issues)
+            if all_time_series:
+                print(f"  Inserting {len(all_time_series)} time series samples...")
+                timeseries_repo.bulk_create(db, all_time_series, commit=False)
+                time_series_samples_created += len(all_time_series)
+
+            # Collect all sleep records and details for bulk insert
+            sleep_records = []
+            sleep_details = []
+
+            print(f"  Generating 20 sleep records...")
             for sleep_num in range(1, 21):
                 record, detail = generate_sleep(user.id, fake)
-                event_record_service.create(db, record)
-                event_detail_repo.create(db, detail, detail_type="sleep")
-                sleeps_created += 1
+                sleep_records.append(record)
+                sleep_details.append(detail)
 
-                if sleep_num % 10 == 0:
-                    print(f"  Created {sleep_num}/20 sleep records for user {user_num}")
+            # Bulk insert sleep records
+            print(f"  Inserting {len(sleep_records)} sleep records...")
+            event_record_repo.bulk_create(db, sleep_records, commit=False)
+            sleeps_created += len(sleep_records)
 
+            # Bulk insert sleep details
+            print(f"  Inserting {len(sleep_details)} sleep details...")
+            event_detail_repo.bulk_create_sleep(db, sleep_details, commit=False)
+
+            # Single commit per user
+            print(f"  Committing all data for user {user_num}...")
             db.commit()
             print(f"  ✓ Completed all health data for user {user_num}\n")
 
