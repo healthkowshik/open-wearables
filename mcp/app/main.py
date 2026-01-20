@@ -37,17 +37,19 @@ mcp = FastMCP(
     User: "How did I sleep last week?"
     Assistant actions:
       1. Call list_users() to find the user's ID
-      2. Call get_sleep_records(user_id="{user_id}", days=7)
-      3. Respond with: "Over the past week, you averaged 7.2 hours of sleep per night.
+      2. Calculate dates: start_date = 7 days ago, end_date = today
+      3. Call get_sleep_records(user_id="{user_id}", start_date="2025-01-13", end_date="2025-01-20")
+      4. Respond with: "Over the past week, you averaged 7.2 hours of sleep per night.
          Your best night was Tuesday (8.1 hours), and your shortest was Friday (5.9 hours).
          Your sleep efficiency averaged 89%, which is good."
 
     Example interaction:
     User: "Compare my sleep this week vs last week"
     Assistant actions:
-      1. Call get_sleep_records(user_id="{user_id}", days=14)
-      2. Analyze the data, splitting into two 7-day periods
-      3. Respond with a comparison highlighting trends and changes
+      1. Calculate dates for two-week period: start_date = 14 days ago, end_date = today
+      2. Call get_sleep_records(user_id="{user_id}", start_date="2025-01-06", end_date="2025-01-20")
+      3. Analyze the data, splitting into two 7-day periods
+      4. Respond with a comparison highlighting trends and changes
 
     The API key determines which users you can access (personal, team, or enterprise scope).
     All data is returned in a normalized format regardless of the original wearable provider.
