@@ -1,7 +1,7 @@
 """MCP tool for querying sleep records."""
 
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import datetime
 
 from app.services.api_client import client
 
@@ -32,10 +32,11 @@ def _normalize_datetime(dt_str: str | None) -> str | None:
 async def get_sleep_records(
     user_id: str | None = None,
     user_name: str | None = None,
-    days: int = 7,
+    start_date: str | None = None,
+    end_date: str | None = None,
 ) -> dict:
     """
-    Get sleep records for a user over the last X days.
+    Get sleep records for a user within a date range.
 
     This tool retrieves daily sleep summaries including start time, end time,
     duration, and sleep stages (if available from the wearable device).
@@ -45,7 +46,10 @@ async def get_sleep_records(
                  or list available users if multiple exist.
         user_name: First name of the user to search for. Used if user_id is not provided.
                    Example: "John" will match users with "John" in their first name.
-        days: Number of days to look back. Default is 7. Maximum is 90.
+        start_date: Start date in YYYY-MM-DD format. Required.
+                    Example: "2025-01-01"
+        end_date: End date in YYYY-MM-DD format. Required.
+                  Example: "2025-01-07"
 
     Returns:
         A dictionary containing:
@@ -79,6 +83,9 @@ async def get_sleep_records(
         }
 
     Notes for LLMs:
+        - Both start_date and end_date are required. Calculate dates based on user queries:
+          "last week" → start_date = 7 days ago, end_date = today
+          "January 2025" → start_date = "2025-01-01", end_date = "2025-01-31"
         - If user_id is not provided and multiple users exist, this will return
           an error with available_users list. Use list_users to discover users first.
         - Duration is in minutes. Use duration_formatted for human-readable output.
@@ -88,8 +95,12 @@ async def get_sleep_records(
         - The 'source' field indicates which wearable provided the data (whoop, garmin, etc.)
         - For questions about sleep quality, check if stages data is available in the backend.
     """
-    # Validate days parameter
-    days = min(max(1, days), 90)
+    # Validate date parameters
+    if not start_date or not end_date:
+        return {
+            "error": "Both start_date and end_date are required (YYYY-MM-DD format).",
+            "example": {"start_date": "2025-01-01", "end_date": "2025-01-07"},
+        }
 
     try:
         # Step 1: Resolve user ID
@@ -167,18 +178,11 @@ async def get_sleep_records(
                     "total_users": len(users),
                 }
 
-        # Step 2: Calculate date range
-        end_date = datetime.now(UTC)
-        start_date = end_date - timedelta(days=days)
-
-        start_str = start_date.strftime("%Y-%m-%d")
-        end_str = end_date.strftime("%Y-%m-%d")
-
-        # Step 3: Fetch sleep data
+        # Step 2: Fetch sleep data
         sleep_response = await client.get_sleep_summaries(
             user_id=resolved_user["id"],
-            start_date=start_str,
-            end_date=end_str,
+            start_date=start_date,
+            end_date=end_date,
         )
 
         records_data = sleep_response.get("data", [])
@@ -227,7 +231,7 @@ async def get_sleep_records(
 
         return {
             "user": resolved_user,
-            "period": {"start": start_str, "end": end_str},
+            "period": {"start": start_date, "end": end_date},
             "records": records,
             "summary": summary,
         }
