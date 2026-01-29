@@ -12,7 +12,8 @@ def present_health_data() -> list[Message]:
     """Guidelines for presenting health data to users in a readable format."""
     return [
         Message(
-            """When presenting health data to users, follow these formatting guidelines:
+            role="system",
+            content="""When presenting health data to users, follow these formatting guidelines:
 
 **Numbers and Units:**
 - Steps: format for readability (e.g., 8432 steps)
@@ -37,6 +38,6 @@ You burned 2450 active calories and spent 90 minutes in vigorous activity zones.
 **Example Bad Response:**
 "steps: 58800, distance_meters: 43680.5, active_calories_kcal: 2450.3,
 total_calories_kcal: 15050.0, avg_active_minutes: 55"
-"""
+""",
         )
     ]
