@@ -12,7 +12,7 @@ def present_health_data() -> list[Message]:
     """Guidelines for presenting health data to users in a readable format."""
     return [
         Message(
-            role="system",
+            role="user",
             content="""When presenting health data to users, follow these formatting guidelines:
 
 **Numbers and Units:**
