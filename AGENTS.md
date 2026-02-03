@@ -73,7 +73,7 @@ make stop
 
 **Backend & MCP** (run from repo root):
 ```bash
-pre-commit run --all-files
+uv run pre-commit run --all-files
 ```
 
 **Frontend:**

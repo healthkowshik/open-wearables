@@ -219,7 +219,7 @@ Then configure the connection:
 Run from the repository root:
 
 ```bash
-pre-commit run --all-files
+uv run pre-commit run --all-files
 ```
 
 ## Troubleshooting
