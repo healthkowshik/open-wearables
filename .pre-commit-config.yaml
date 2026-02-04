@@ -10,18 +10,11 @@ repos:
 
   - repo: local
     hooks:
-      - id: ty-backend
-        name: ty check (backend)
-        entry: sh -c 'cd backend && .venv/bin/ty check .'
+      - id: ty
+        name: ty check (backend & mcp)
+        entry: sh -c 'set -e; (cd backend && uv run ty check .); (cd mcp && uv run ty check .)'
         language: system
-        files: ^backend/.*\.py$
-        pass_filenames: false
-
-      - id: ty-mcp
-        name: ty check (mcp)
-        entry: sh -c 'cd mcp && .venv/bin/ty check .'
-        language: system
-        files: ^mcp/.*\.py$
+        files: ^(backend|mcp)/.*\.py$
         pass_filenames: false
 
   - repo: https://github.com/pre-commit/pre-commit-hooks

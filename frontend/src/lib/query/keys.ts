@@ -75,8 +75,8 @@ export const queryKeys = {
       [...queryKeys.health.all, 'sleepSummaries', userId, params] as const,
     activitySummaries: (userId: string, params?: unknown) =>
       [...queryKeys.health.all, 'activitySummaries', userId, params] as const,
-    bodySummaries: (userId: string, params?: unknown) =>
-      [...queryKeys.health.all, 'bodySummaries', userId, params] as const,
+    bodySummary: (userId: string, params?: unknown) =>
+      [...queryKeys.health.all, 'bodySummary', userId, params] as const,
     activity: (userId: string, days: number) =>
       [...queryKeys.health.all, 'activity', userId, days] as const,
     summary: (userId: string, period?: string) =>
@@ -124,6 +124,14 @@ export const queryKeys = {
         'list',
         { cloudOnly, enabledOnly },
       ] as const,
+  },
+
+  priorities: {
+    all: ['priorities'] as const,
+    providers: () => [...queryKeys.priorities.all, 'providers'] as const,
+    deviceTypes: () => [...queryKeys.priorities.all, 'deviceTypes'] as const,
+    dataSources: (userId: string) =>
+      [...queryKeys.priorities.all, 'dataSources', userId] as const,
   },
 
   developers: {

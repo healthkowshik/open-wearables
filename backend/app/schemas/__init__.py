@@ -29,11 +29,16 @@ from .common import (
     RootJSON,
 )
 from .common_types import (
-    DataSource,
     ErrorDetails,
     PaginatedResponse,
     Pagination,
+    SourceMetadata,
     TimeseriesMetadata,
+)
+from .data_source import (
+    DataSourceCreate,
+    DataSourceResponse,
+    DataSourceUpdate,
 )
 from .developer import (
     DeveloperCreate,
@@ -41,6 +46,14 @@ from .developer import (
     DeveloperRead,
     DeveloperUpdate,
     DeveloperUpdateInternal,
+)
+from .device_type import DeviceType
+from .device_type_priority import (
+    DeviceTypePriorityBulkUpdate,
+    DeviceTypePriorityCreate,
+    DeviceTypePriorityListResponse,
+    DeviceTypePriorityResponse,
+    DeviceTypePriorityUpdate,
 )
 from .error_codes import ErrorCode
 from .event_record import (
@@ -63,11 +76,6 @@ from .events import (
     Workout,
     WorkoutDetailed,
     WorkoutType,
-)
-from .external_mapping import (
-    ExternalMappingCreate,
-    ExternalMappingResponse,
-    ExternalMappingUpdate,
 )
 from .filter_params import FilterParams
 from .garmin.activity_import import (
@@ -112,6 +120,13 @@ from .personal_record import (
 from .polar.exercise_import import (
     ExerciseJSON as PolarExerciseJSON,
 )
+from .provider_priority import (
+    ProviderPriorityBulkUpdate,
+    ProviderPriorityCreate,
+    ProviderPriorityListResponse,
+    ProviderPriorityResponse,
+    ProviderPriorityUpdate,
+)
 from .provider_setting import (
     BulkProviderSettingsUpdate,
     ProviderSettingRead,
@@ -150,7 +165,10 @@ from .system_info import (
     SystemInfoResponse,
 )
 from .timeseries import (
+    ActiveMinutesResult,
+    ActivityAggregateResult,
     HeartRateSampleCreate,
+    IntensityMinutesResult,
     StepSampleCreate,
     TimeSeriesQueryParams,
     TimeSeriesSample,
@@ -225,9 +243,12 @@ __all__ = [
     "EventRecordDetailResponse",
     "EventRecordDetailUpdate",
     "WorkoutType",
-    "ExternalMappingCreate",
-    "ExternalMappingUpdate",
-    "ExternalMappingResponse",
+    "DataSourceCreate",
+    "DataSourceUpdate",
+    "DataSourceResponse",
+    "ActivityAggregateResult",
+    "ActiveMinutesResult",
+    "IntensityMinutesResult",
     "HeartRateSampleCreate",
     "TimeSeriesSampleCreate",
     "TimeSeriesSampleResponse",
@@ -276,7 +297,7 @@ __all__ = [
     "SyncAllUsersResult",
     "SyncVendorDataResult",
     # Common Types
-    "DataSource",
+    "SourceMetadata",
     "ErrorDetails",
     "PaginatedResponse",
     "Pagination",
@@ -297,4 +318,17 @@ __all__ = [
     "RecoverySummary",
     "SleepStagesSummary",
     "SleepSummary",
+    # Priority schemas
+    "ProviderPriorityCreate",
+    "ProviderPriorityUpdate",
+    "ProviderPriorityResponse",
+    "ProviderPriorityListResponse",
+    "ProviderPriorityBulkUpdate",
+    "DeviceTypePriorityCreate",
+    "DeviceTypePriorityUpdate",
+    "DeviceTypePriorityResponse",
+    "DeviceTypePriorityListResponse",
+    "DeviceTypePriorityBulkUpdate",
+    # Device type
+    "DeviceType",
 ]
