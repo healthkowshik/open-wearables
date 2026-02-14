@@ -9,14 +9,20 @@ from .apple.auto_export.json_schemas import (
 from .apple.auto_export.json_schemas import (
     WorkoutJSON as AEWorkoutJSON,
 )
-from .apple.healthkit.record_import import (
-    RecordJSON as HKRecordJSON,
+from .apple.healthkit.sync_request import (
+    MetricRecord as HKMetricRecordJSON,
 )
-from .apple.healthkit.workout_import import (
-    WorkoutJSON as HKWorkoutJSON,
+from .apple.healthkit.sync_request import (
+    SleepRecord as HKSleepRecordJSON,
 )
-from .apple.healthkit.workout_import import (
-    WorkoutStatisticJSON as HKWorkoutStatisticJSON,
+from .apple.healthkit.sync_request import (
+    SyncRequest as AppleHealthDataRequest,
+)
+from .apple.healthkit.sync_request import (
+    Workout as HKWorkoutJSON,
+)
+from .apple.healthkit.sync_request import (
+    WorkoutStatistic as HKWorkoutStatisticJSON,
 )
 from .application import (
     ApplicationCreate,
@@ -135,6 +141,9 @@ from .provider_setting import (
 from .response import UploadDataResponse
 from .sdk import SDKAuthContext, SDKTokenRequest
 from .series_types import SeriesType
+from .strava.activity_import import (
+    ActivityJSON as StravaActivityJSON,
+)
 from .summaries import (
     ActivitySummary,
     BloodPressure,
@@ -175,6 +184,10 @@ from .timeseries import (
     TimeSeriesSampleCreate,
     TimeSeriesSampleResponse,
     TimeSeriesSampleUpdate,
+)
+from .token import (
+    RefreshTokenRequest,
+    TokenResponse,
 )
 from .user import (
     UserCreate,
@@ -260,9 +273,11 @@ __all__ = [
     "SystemInfoResponse",
     "CountWithGrowth",
     "DataPointsInfo",
-    "HKRecordJSON",
+    "HKMetricRecordJSON",
+    "HKSleepRecordJSON",
     "HKWorkoutJSON",
     "HKWorkoutStatisticJSON",
+    "AppleHealthDataRequest",
     "AEWorkoutJSON",
     "AEHeartRateEntryJSON",
     "AEActiveEnergyEntryJSON",
@@ -285,6 +300,8 @@ __all__ = [
     "GarminRespirationJSON",
     # Polar schemas
     "PolarExerciseJSON",
+    # Strava schemas
+    "StravaActivityJSON",
     # Whoop schemas
     "WhoopWorkoutJSON",
     "WhoopWorkoutCollectionJSON",
@@ -331,4 +348,7 @@ __all__ = [
     "DeviceTypePriorityBulkUpdate",
     # Device type
     "DeviceType",
+    # Token schemas
+    "TokenResponse",
+    "RefreshTokenRequest",
 ]
